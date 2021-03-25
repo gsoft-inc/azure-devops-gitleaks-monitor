@@ -1,0 +1,351 @@
+title = "gitleaks config"
+
+[[rules]]
+description = "Pure Entropy"
+regex = '''['|"][0-9a-zA-Z-._{}$\/=]{40,120}['|"]'''
+	[[rules.Entropies]]
+	Min = "5.0"
+	Max = "5.6"
+	[rules.allowlist]
+	regexes = [
+		'''(assertEquals\(HAPI_BASE.*\))''',
+		'''(?i)integrity.*(sha|md5)'''
+		]
+
+
+[[rules]]
+description = "Entropy plus Generic Credential"
+regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
+	[[rules.Entropies]]
+	Min = "4.3" #"5.2"
+	Max = "7.0" # "5.5"
+
+
+[[rules]]
+	description = "AWS Access Key"
+	regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+	tags = ["key", "AWS"]
+
+[[rules]]
+	description = "AWS cred file info"
+	regex = '''(?i)(aws_access_key_id|aws_secret_access_key)(.{0,20})?=.[0-9a-zA-Z\/+]{20,40}'''
+	tags = ["AWS"]
+
+[[rules]]
+	description = "AWS Secret Key"
+	regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+	tags = ["key", "AWS"]
+
+[[rules]]
+	description = "AWS MWS key"
+	regex = '''amzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'''
+	tags = ["key", "AWS", "MWS"]
+
+[[rules]]
+	description = "Facebook Secret Key"
+	regex = '''(?i)(facebook|fb)(.{0,20})?(?-i)['\"][0-9a-f]{32}['\"]'''
+	tags = ["key", "Facebook"]
+
+[[rules]]
+	description = "Twitter Secret Key"
+	regex = '''(?i)twitter(.{0,20})?['\"][0-9a-z]{35,44}['\"]'''
+	tags = ["key", "Twitter"]
+
+[[rules]]
+	description = "Github"
+	regex = '''(?i)github(.{0,20})?(?-i)['\"][0-9a-zA-Z]{35,40}['\"]'''
+	tags = ["key", "Github"]
+
+[[rules]]
+	description = "LinkedIn Secret Key"
+	regex = '''(?i)linkedin(.{0,20})?['\"][0-9a-z]{16}['\"]'''
+	tags = ["secret", "LinkedIn"]
+
+[[rules]]
+	description = "Slack"
+	regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})?'''
+	tags = ["key", "Slack"]
+
+[[rules]]
+	description = "EC"
+	regex = '''-----BEGIN EC PRIVATE KEY-----'''
+	tags = ["key", "EC"]
+
+
+[[rules]]
+	description = "Google API key"
+	regex = '''AIza[0-9A-Za-z\\-_]{35}'''
+	tags = ["key", "Google"]
+
+
+[[rules]]
+	description = "Heroku API key"
+	regex = '''(?i)heroku(.{0,20})?['"][0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}['"]'''
+	tags = ["key", "Heroku"]
+
+[[rules]]
+	description = "MailChimp API key"
+	regex = '''(?i)(mailchimp|mc)(.{0,20})?['"][0-9a-f]{32}-us[0-9]{1,2}['"]'''
+	tags = ["key", "Mailchimp"]
+
+[[rules]]
+	description = "Mailgun API key"
+	regex = '''(?i)(mailgun|mg)(.{0,20})?['"][0-9a-z]{32}['"]'''
+	tags = ["key", "Mailgun"]
+
+[[rules]]
+	description = "PayPal Braintree access token"
+	regex = '''access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}'''
+	tags = ["key", "Paypal"]
+
+[[rules]]
+	description = "Picatic API key"
+	regex = '''sk_live_[0-9a-z]{32}'''
+	tags = ["key", "Picatic"]
+
+[[rules]]
+	description = "Slack Webhook"
+	regex = '''https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}'''
+	tags = ["key", "slack"]
+
+[[rules]]
+	description = "Stripe API key"
+	regex = '''(?i)stripe(.{0,20})?['\"][sk|rk]_live_[0-9a-zA-Z]{24}'''
+	tags = ["key", "Stripe"]
+
+[[rules]]
+	description = "Square access token"
+	regex = '''sq0atp-[0-9A-Za-z\-_]{22}'''
+	tags = ["key", "square"]
+
+[[rules]]
+	description = "Square OAuth secret"
+	regex = '''sq0csp-[0-9A-Za-z\\-_]{43}'''
+	tags = ["key", "square"]
+
+[[rules]]
+	description = "Twilio API key"
+	regex = '''(?i)twilio(.{0,20})?['\"][0-9a-f]{32}['\"]'''
+	tags = ["key", "twilio"]
+
+
+[[rules]]
+	description = "High Entropy"
+	regex = '''[0-9a-zA-Z-_!{}/=]{4,120}'''
+  	file = '''(?i)(dump.sql|high-entropy-misc.txt)$'''
+	tags = ["entropy"]
+    [[rules.Entropies]]
+        Min = "4.3"
+        Max = "7.0"
+    [rules.allowlist]
+        description = "ignore ssh key and pems"
+        files = ['''(pem|ppk|env)$''']
+        paths = ['''(.*)?ssh''']
+
+
+[[rules]]
+	description = "Potential bash var"
+	regex='''(?i)(=)([0-9a-zA-Z-_!{}=]{4,120})'''
+	tags = ["key", "bash", "API", "generic"]
+        [[rules.Entropies]]
+            Min = "3.5"
+            Max = "4.5"
+            Group = "1"
+
+
+[[rules]]
+	description = "WP-Config"
+	regex='''define(.{0,20})?(DB_CHARSET|NONCE_SALT|LOGGED_IN_SALT|AUTH_SALT|NONCE_KEY|DB_HOST|DB_PASSWORD|AUTH_KEY|SECURE_AUTH_KEY|LOGGED_IN_KEY|DB_NAME|DB_USER)(.{0,20})?['|"].{10,120}['|"]'''
+	tags = ["key", "API", "generic"]
+
+
+[[rules]]
+	description = "Files with keys and credentials"
+    file = '''(?i)(id_rsa|passwd|id_rsa.pub|pgpass|\.pem|key|shadow)$'''
+    [rules.allowlist]
+        files = ['''(?i)\.(tf|cs)''']
+
+
+[[rules]]
+	description = "Generic Credential"
+	regex = '''(?i)(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|secret|userpw|password|auth|token)(.{0,20})?[:=]\s*['|"]([0-9a-zA-Z-_\/+!{}/=]{4,120})['|"]'''
+	[rules.allowlist]
+		regexes = [
+		    '''xox[baprs]-([0-9a-zA-Z]{10,48})''',
+		    '''(?i)(.{0,20})?['"][0-9a-f]{32}-us[0-9]{1,2}['"]''',
+		    '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}''',
+			'''(input type=.*)''',
+			'''resource ".*" ".*" \{''', # terraform
+			'''data ".*" ".*" \{''',  # terraform
+			'''[a-zA-Z0-9]+\.(FirstOrDefault|First|Select|SelectMany|ToDictionary|Single|ForEach|Map)\([a-zA-Z0-9]+''',
+			'''ExtensionDataItem''',
+			'''AppSettings.Get''',
+			'''\[(FromUri|FromBody|FromQuery|FromRoute|AliasAs|Path|Query)''',
+			'''value=\"\{!\$''',
+			'''(?i)(object|result|token|data|collection|form)\["[a-z_-]+"\].*[^=]$''',
+			'''(?i)^\s*[\/]{2,}\s*.*(token|secret|password|api).*$''', # Comments
+			'''soapAction''',
+			'''(?i)i:0#\.f\|membership''', # SharePoint user
+			'''JsonConvert.Deserialize''',
+			'''resource_names\s=''',
+			'''(?i)(token|secret)\.tostring()''',
+
+			# Password
+			'''(?i)password(box|view|expir|index)''',
+			'''new random.RandomPassword''',
+			'''(Password|Authentication).*(Encryption|Cookie)Image''',
+			'''(?i)password\s*[=:]\s*['"]?x+['"]?''',
+			'''(?i)password\s*=\s*["']?\[parameters\(''',
+			'''(?i)password[a-z0-9_-]*(enabled|name)''',
+			'''(?i)password\s*=\s*["']input[a-z]*password["']''',
+			'''(?i)(module\.params|mongocnf_creds)\[["'][a-z_-]*password["']\]''',
+			'''(?i)config\.get\(["']client["'], ["']pass["']\)''',
+			'''update_password [!=]= ['"]always['"]''',
+			'''password is None''',
+
+			# Key
+			'''(?i)key for''',
+			'''(?i)key=\{[a-z0-9.]+\}''',
+			'''key="EnvironmentCode"''',
+			'''(?i)name="[a-z]*Key" type="[a-z]+"''',
+			'''(?i)(Primary|Foreign|Cache|Container|AdoCredentials|Folder|Style|Project|Subtask|Credentials|Sid|Encoding|Unique|Locale|Partition|Row|VisibleTabs|ContentType|Accept|Information|Contains|Instrumentation|Name|Version|Subject|Item(Group)?)Key''',
+			'''(?i)(api[_-]?)?key\s*(=|:)\s*["']?api[_-]?key["']?''',
+			'''(?i)key\.(set|get)''',
+			'''(?i)key.tostring''',
+			'''(?i)key\s*=\s*["']enable''',
+			'''(?i)(get|(find(last)?)|(un)?wrap)key''',
+			'''key="AzureApplicationId"''',
+			'''(?i)is(nullor)?empty\([a-z]+key\)''',
+			'''(?i)key__c''',
+			'''e.key ==''',
+			'''Keys?Permissions''',
+			'''GetString("[a-zA-Z0-9]+Key")''',
+			'''KeyNotFoundException''',
+
+			# Auth
+			'''(?i)lastauth''',
+			'''(?i)authentication­\s =''',
+			'''(?i)auth(entication)?[ _-]?(started|ended|exception|type|helper|mode)''',
+			'''(?i)auth(entication)?(request\.)?method''',
+			'''X-FORMS_BASED_AUTH_ACCEPTED''',
+
+			# Secret
+			'''GetSecretValue''',
+			'''(?i)secrets?[-_]?(notfound|repository|permission)''',
+
+			#Token
+			'''(?i)token[a-z]*(found|valid|occured)''',
+			'''(?i)tokenize''',
+			'''(?i)(get|notsupported)[a-z_-]*token''',
+			'''(?i)(request)?token\.(post|get)''',
+			'''(?i)token\s*=\s*["']input[a-z]*token["']''',
+			'''(?i)token\s*=\s*["'][a-z]*column["']''',
+			'''vault token''',
+			'''TokenHeaderKey''',
+		]
+		files = [
+		'''(?i)\.(tf|tfvars|tfstate|tfstate.backup|yml|xml|xml.orig|conf(ig)?|json|ya?ml|csproj|vbproj|sln|txt|md)$''',
+		]
+
+[[rules]]
+	description = "Generic Credential in configuration file"
+	regex = '''(?i)(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|secret|userpw|password|auth|token)(.{0,20})?[:=]\s*['|"]?([0-9a-zA-Z-_\/+!{}/=]{4,120})['|"]?'''
+	[rules.allowlist]
+		regexes = [
+			'''(?i)^\s*(-\s*)?['"]?([a-z0-9_-]+\.?)+\s*['"]?[:=]\s*['"]?(enabled|disabled|true|false|yes|no|always|never|list|delete)['"]?,?\s*$''',
+			'''(?i)(token|secret|key|password)":\s*"\${[a-z0-9:]+}''',
+
+			# Terraform
+			'''disable_password_authentication''',
+			'''(?i)=\s?(module|data|local|random_password|azurerm_[a-z_]+).([a-z0-9_]+\.?)+\s*$''',
+			'''auth_database_name =''',
+			''':\s*null''',
+			'''=\s*"@Microsoft.KeyVault\(SecretUri=https://[a-z0-9-]+.vault.azure.net/secrets''',
+			'''key_vault_secret_id\s*=''',
+
+			# Ansible
+			'''(?i)password\s*=\s*{{\s*[a-z0-9_]+\s*}}''',
+			'''mongodb_user_update_password: "[a-z_]+"''',
+			'''ansible.vault_password_file''',
+			'''(when:\s*\(|and|or)\s*[a-z_]+ [!=]= ["'][a-z]+["']''',
+			'''az_devops_accesstoken: !vault''',
+
+			# Key
+			'''key_vault_id''',
+
+			# Secret
+			'''secretType: ["']dockerRegistry["']''',
+		]
+		files = [
+		'''(?i)(.*?)\.(cs|cls|vb|vbs|js|jsx|ts|tsx|java|php|py|rb|perl|c|cpp|ps1|psm1|sh|cmd)(\.orig)?$''',
+		'''(?i)example.(tfvars|yml)$''',
+		]
+
+# Global allowlist
+[allowlist]
+	regexes = [
+		'''(?i)(password|key|secret|auth|token)[a-z0-9_-]*(enabled|disabled|allowed)''',
+		'''(?i)connectionstringformat''',
+		'''(?i)(unexpected|invalid)[a-z_-]*_?(token|signature)''',
+
+		# Auth
+		'''(?i)authenticate[?:= ]''',
+		'''(?i)auth(entication)?(mechanism|bypass)''',
+		'''LOG_AUTH''',
+		'''(?i)(browser)auth''',
+		'''(?i)(author|auth(entication)?_?type|LOG_AUTH|authori[sz]ed)''',
+		'''(?i)auth[-_]?prefix''',
+		'''(?i)(typeof|anonymous)authentication''',
+		'''(?i)authentication"? (enabled|type|mode)=''',
+
+		# Secret
+		'''(?i)secret(name|edit)''',
+
+		# Key
+		'''(?i)public_?key_?token''',
+		'''(?i)key\s*[=:]\s*["']?password["']?''',
+		'''(?i)key(word|set|note|result)''',
+		'''(?i)key="username"''',
+		'''(?i)key[a-z]*name''',
+		'''YOUR_SECRET_ACCESS_KEY''',
+		'''(?i)"?apikey"?\s*[:=]\s*"api[_-]?key"''',
+
+		# Password
+		'''(?i)["']?password["']?\s*[=:]\s*["']?password["']?''',
+		'''(?i)= get[a-z]*(password|secret|token|key)\(\)''',
+
+		# Token
+		'''(?i)token[a-z]*(type|parameter|name)''',
+		'''(?i)token_?(key|request|repository|target|table|suffix|prefix|resource|algorithm|image|cache)''',
+		'''(?i)token="\s*\+\s*[a-z]token\);''',
+		'''(?i)['"]?[a-z]token['"]?\s*=\s*[a-z]token''',
+		'''(?i)a valid [a-z ]*token''',
+		'''YOUR_GITLAB_TOKEN''',
+		'''(?i)(defaultclaims|select|urlparam|page|cancel(lation)?|since|username|concurrency|date|split|firstname|email|date)_?token''',
+		'''token=mytoken''',
+		'''Personal Access Token''',
+		'''(?i)expiredtoken''',
+		'''(?i)token[a-z_-]*expir''',
+	]
+	files = [
+		'''(?i)(.*?)(jpg|gif|doc|pdf|bin|xaml|min\.map|edmx|html|cshtml|iml|s?css|js\.map|resx|deps\.json|xsd|wsdl)$''',
+		'''(?i)\.dll(-help)?\.xml$''',
+		'''(?i).*\.(min|debug|bundle)\.js$''',
+		'''^modules.json$''',
+		'''^package(-lock)?.json$''',
+		'''^project.lock.json$''',
+		'''(?i)messages.*\.resx(\.orig)?$''',
+		'''Test.*\.cls$''',
+		'''(bootstrap|jquery|lodash|moment|knockout|date|jqxribbon).*\.js$''',
+		'''(?i)^ruleset.*\.xml$''',
+		'''^workspace.xml$''',
+		'''^Microsoft.Data.OData.xml$''',
+		'''^DocumentFormat.OpenXml.xml$''',
+		'''^Microsoft.WindowsAzure.Storage.xml$''',
+		'''(?i)^newtonsoft.json.xml$''',
+		'''(?i)public_?key.pem$''',
+	]
+	paths = [
+		'''bower_components''',
+		'''Binai?ries''',
+	]

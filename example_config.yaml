@@ -1,0 +1,35 @@
+organizations:
+  default: # Default organization configuration. Values can be overridden for each organization.
+    username: "john.doe"
+    password: "azure-devops-pat-here"
+    projects:
+      default:
+        repos:
+          default:
+            skip: false # All repositories will be analyzed by default.
+  SomeOrganization:
+    projects:
+      default:  # Default configuration for all projects in this organization.
+        repos:
+          default:
+            allowlist:
+              paths:
+                - ([a-zA-Z]+\.)*Tests(\.(Unit|Integration|System))?
+              files:
+                - (potato|banana).xml$
+              regexes:
+                - (?i)Token(String)? = "{(date|time)}"
+      SomeProject:
+        repos:
+          default: # Default configuration for all repos in this project.
+            allowlist:
+              paths:
+                - "*.txt"
+          ARepoToSkip:
+            skip: true # This repository won't be analyzed.
+          ARepoToPersist:
+            persist: true # If a repo changes often, it might be a good idea to keep it locally.
+          AnotherRepo:
+            allowlist:
+              regexes:
+                - TokenRetrieveLockKey # Will be appended to the rules specified in the default project configuration.

@@ -1,0 +1,8 @@
+azure-devops
+GitPython
+python-dateutil
+pytz
+trufflehog
+pyyaml
+requests
+toml
