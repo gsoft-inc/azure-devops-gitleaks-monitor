@@ -1,4 +1,5 @@
 import copy
+from typing import Dict, List
 
 DEFAULT_KEY = "default"
 
@@ -8,9 +9,9 @@ class GitRepositoryConfiguration:
         self.name = name
         self.skip = False
         self.persist = False
-        self.allowlist: dict[str, []] = {}
+        self.allowlist: Dict[str, List] = {}
 
-    def configure(self, config: dict):
+    def configure(self, config: Dict):
         self.skip = config.get("skip", False)
         self.persist = config.get("persist", False)
 
@@ -20,11 +21,11 @@ class GitRepositoryConfiguration:
 
 class GitProjectConfiguration:
     def __init__(self, name):
-        self.repositories: dict[str, GitRepositoryConfiguration] = {}
+        self.repositories: Dict[str, GitRepositoryConfiguration] = {}
         self._default_repository_configuration = GitRepositoryConfiguration(DEFAULT_KEY)
         self.name = name
 
-    def configure(self, config: dict):
+    def configure(self, config: Dict):
         repo_configs = config.get("repos", {})
         default_repo_config = repo_configs.get(DEFAULT_KEY)
         if default_repo_config:
@@ -45,7 +46,7 @@ class GitProjectConfiguration:
 
 class OrganizationConfiguration:
     def __init__(self, name):
-        self._projects: dict[str, GitProjectConfiguration] = {}
+        self._projects: Dict[str, GitProjectConfiguration] = {}
         self._default_project_configuration = GitProjectConfiguration(DEFAULT_KEY)
         self.name = name
         self.username = ""

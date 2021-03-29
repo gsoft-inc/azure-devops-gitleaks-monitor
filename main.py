@@ -68,7 +68,7 @@ def main():
     default_config_file_path = script_directory / default_config_file
     default_cache_path = Path("~/.azure-devops-secret-finder").expanduser()
 
-    parser = argparse.ArgumentParser(description='Github Secret Finder')
+    parser = argparse.ArgumentParser(description='Azure DevOps Gitleaks monitor')
     parser.add_argument('--config', '-c', action='store', dest='config_file', default=default_config_file_path, help=f'Configuration file. Defaults to {default_config_file}')
     parser.add_argument('--cache', action='store', dest='cache_path', default=default_cache_path, help=f'Cache location. Defaults to {default_cache_path}')
     parser.add_argument('--all', '-a', action="store_true", dest='output_all', default=False, help="Also outputs the previously found results.")

@@ -5,7 +5,7 @@ from azure.devops.connection import Connection
 from datetime import datetime
 from msrest.authentication import BasicAuthentication
 from requests.auth import HTTPBasicAuth
-from typing import Iterator
+from typing import Dict, Iterator
 from model.git_repository import GitRepositoryInformation
 
 
@@ -37,7 +37,7 @@ class AzureDevopsConnector(object):
                 return dateutil.parser.isoparse(value[0]["date"])
         return datetime.min.replace(tzinfo=pytz.UTC)
 
-    def get_branches(self, repository_id) -> dict[str, str]:
+    def get_branches(self, repository_id) -> Dict[str, str]:
         return dict(("origin/" + branch.name, branch.commit.commit_id) for branch in self._git_client.get_branches(repository_id))
 
     def _get_projects(self):
