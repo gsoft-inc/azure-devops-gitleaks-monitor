@@ -9,7 +9,8 @@ regex = '''['|"][0-9a-zA-Z-._{}$\/=]{40,120}['|"]'''
 	[rules.allowlist]
 	regexes = [
 		'''(assertEquals\(HAPI_BASE.*\))''',
-		'''(?i)integrity.*(sha|md5)'''
+		'''(?i)integrity.*(sha|md5)''',
+		'''(?i)revision[_-]?id''',
 		]
 
 
@@ -228,6 +229,7 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 			'''(?i)auth(entication)?[ _-]?(started|ended|exception|type|helper|mode)''',
 			'''(?i)auth(entication)?(request\.)?method''',
 			'''X-FORMS_BASED_AUTH_ACCEPTED''',
+			'''(?i)auth(request)?\.contenttype\s*=''',
 
 			# Secret
 			'''GetSecretValue''',
@@ -244,7 +246,7 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 			'''TokenHeaderKey''',
 		]
 		files = [
-		'''(?i)\.(tf|tfvars|tfstate|tfstate.backup|yml|xml|xml.orig|conf(ig)?|json|ya?ml|csproj|vbproj|sln|txt|md)$''',
+		'''(?i)\.(tf|tfvars|tfstate|tfstate.backup|yml|xml|xml.orig|conf(ig)?|json|ya?ml|csproj|vbproj|sln|cscfg|txt|md)$''',
 		]
 
 [[rules]]
@@ -252,7 +254,7 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 	regex = '''(?i)(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|secret|userpw|password|auth|token)(.{0,20})?[:=]\s*['|"]?([0-9a-zA-Z-_\/+!{}/=]{4,120})['|"]?'''
 	[rules.allowlist]
 		regexes = [
-			'''(?i)^\s*(-\s*)?['"]?([a-z0-9_-]+\.?)+\s*['"]?[:=]\s*['"]?(enabled|disabled|true|false|yes|no|always|never|list|delete)['"]?,?\s*$''',
+			'''(?i)^\s*(-\s*)?['"]?[a-z0-9._-]+\s*['"]?\s*[:=]\s*['"]?(enabled|disabled|true|false|yes|no|always|never|list|delete)['"]?,?\s*$''',
 			'''(?i)(token|secret|key|password)":\s*"\${[a-z0-9:]+}''',
 
 			# Terraform
@@ -275,6 +277,10 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 
 			# Secret
 			'''secretType: ["']dockerRegistry["']''',
+
+			# Auth
+			'''AuthConfiguration"\s*:\s*"AspNet_MVC"''',
+			'''(?i)["']?auth[a-z0-9_-]*url["']?\s*[:=]''',
 		]
 		files = [
 		'''(?i)(.*?)\.(cs|cls|vb|vbs|js|jsx|ts|tsx|java|php|py|rb|perl|c|cpp|ps1|psm1|sh|cmd)(\.orig)?$''',
@@ -287,6 +293,8 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 		'''(?i)(password|key|secret|auth|token)[a-z0-9_-]*(enabled|disabled|allowed)''',
 		'''(?i)connectionstringformat''',
 		'''(?i)(unexpected|invalid)[a-z_-]*_?(token|signature)''',
+		'''(?i)=\s*get[a-z]*(pass(word)?|secret|token|key)\(\)''',
+		'''(?i)<add key="[a-z0-9:_-]+" xdt:Transform="Remove" xdt:Locator="Match\(key\)" \/>''',
 
 		# Auth
 		'''(?i)authenticate[?:= ]''',
@@ -299,7 +307,7 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 		'''(?i)authentication"? (enabled|type|mode)=''',
 
 		# Secret
-		'''(?i)secret(name|edit)''',
+		'''(?i)secret(name|edit|provider)''',
 
 		# Key
 		'''(?i)public_?key_?token''',
@@ -312,24 +320,24 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 
 		# Password
 		'''(?i)["']?password["']?\s*[=:]\s*["']?password["']?''',
-		'''(?i)= get[a-z]*(password|secret|token|key)\(\)''',
 
 		# Token
 		'''(?i)token[a-z]*(type|parameter|name)''',
-		'''(?i)token_?(key|request|repository|target|table|suffix|prefix|resource|algorithm|image|cache)''',
+		'''(?i)token_?(key|request|repository|target|table|suffix|prefix|resource|algorithm|image|cache|provider)''',
 		'''(?i)token="\s*\+\s*[a-z]token\);''',
 		'''(?i)['"]?[a-z]token['"]?\s*=\s*[a-z]token''',
 		'''(?i)a valid [a-z ]*token''',
 		'''YOUR_GITLAB_TOKEN''',
-		'''(?i)(defaultclaims|select|urlparam|page|cancel(lation)?|since|username|concurrency|date|split|firstname|email|date)_?token''',
+		'''(?i)(defaultclaims|select|urlparam|page|cancel(lation)?|since|username|concurrency|continuation|date|split|firstname|email|date)_?token''',
 		'''token=mytoken''',
 		'''Personal Access Token''',
 		'''(?i)expiredtoken''',
 		'''(?i)token[a-z_-]*expir''',
+		'''WACTokenShared = "WACTokenShared"'''
 	]
 	files = [
-		'''(?i)(.*?)(jpg|gif|doc|pdf|bin|xaml|min\.map|edmx|html|cshtml|iml|s?css|js\.map|resx|deps\.json|xsd|wsdl)$''',
-		'''(?i)\.dll(-help)?\.xml$''',
+		'''(?i)(.*?)(jpg|gif|doc|pdf|bin|xaml|min\.map|edmx|html|cshtml|iml|s?css|less|js\.map|resx|deps\.json|xsd|wsdl)$''',
+		'''(?i)\.dll(-help)?\.xml(\.orig)?$''',
 		'''(?i).*\.(min|debug|bundle)\.js$''',
 		'''^modules.json$''',
 		'''^package(-lock)?.json$''',
@@ -348,4 +356,6 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 	paths = [
 		'''bower_components''',
 		'''Binai?ries''',
+		'''.idea/''',
+		'''node_modules''',
 	]
