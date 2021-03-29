@@ -1,11 +1,13 @@
-import requests
+from datetime import datetime
+from typing import Dict, Iterator
+
 import dateutil.parser
 import pytz
+import requests
 from azure.devops.connection import Connection
-from datetime import datetime
 from msrest.authentication import BasicAuthentication
 from requests.auth import HTTPBasicAuth
-from typing import Dict, Iterator
+
 from model.git_repository import GitRepositoryInformation
 
 
@@ -34,7 +36,7 @@ class AzureDevopsConnector(object):
             j = response.json()
             value = j.get("value")
             if value and len(value) == 1:
-                return dateutil.parser.isoparse(value[0]["date"])
+                return dateutil.parser.parse(value[0]["date"])
         return datetime.min.replace(tzinfo=pytz.UTC)
 
     def get_branches(self, repository_id) -> Dict[str, str]:

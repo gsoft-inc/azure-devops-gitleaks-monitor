@@ -31,7 +31,8 @@ class GitRepository(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.repo.git.clear_cache()
+        if hasattr(self.repo, "git"):
+            self.repo.git.clear_cache()
         del self.repo
         if not self._repo_config.persist:
             rmdir(self.path)

@@ -4,8 +4,11 @@ import stat
 
 
 def del_rw(action, name, exc):
-    os.chmod(name, stat.S_IWRITE)
-    os.remove(name)
+    try:
+        os.chmod(name, stat.S_IWRITE)
+        os.remove(name)
+    except FileNotFoundError:
+        pass
 
 
 def rmdir(path):
