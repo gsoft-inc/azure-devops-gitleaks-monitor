@@ -1,19 +1,23 @@
-import config
-import git
 import logging
+from pathlib import Path
+from urllib.parse import quote
+
+import git
+
 import model.config
 from model.git_repository import GitRepositoryInformation
 from util import rmdir
-from urllib.parse import quote
 
 
 class GitRepository(object):
+    repos_path: Path = None
+
     def __init__(self,
                  organization_config: model.config.OrganizationConfiguration,
                  repo_config: model.config.GitRepositoryConfiguration,
                  repo_info: GitRepositoryInformation):
         self.repo: git.Repo = None
-        self.path = config.repos_path / repo_info.name
+        self.path = GitRepository.repos_path / repo_info.name
 
         self._repo_config = repo_config
         self._repo_info = repo_info
@@ -39,7 +43,7 @@ class GitRepository(object):
 
         if not self.path.exists():
             logging.debug(f"Cloning {self._repo_info} to {self.path}...")
-            git.Git(str(config.repos_path)).clone(self._remote_url, self.path)
+            git.Git(str(GitRepository.repos_path)).clone(self._remote_url, self.path)
             logging.debug(f"{self._repo_info} cloned.")
 
         self.repo = git.Repo(str(self.path))

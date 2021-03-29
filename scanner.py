@@ -1,22 +1,26 @@
-import os
-import config
-import dateutil.parser
 import json
-import tempfile
 import logging
+import os
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+import dateutil.parser
 import toml
+
 from git_repository import GitRepository
 from model.config import OrganizationConfiguration, GitRepositoryConfiguration
 from model.git_repository import GitRepositoryInformation
-from datetime import datetime, timezone
 
 
 class Scanner(object):
+    results_path: Path = None
+
     def __init__(self, org_config: OrganizationConfiguration, repo_config: GitRepositoryConfiguration, repo_info: GitRepositoryInformation):
         self._org_config = org_config
         self._repo_config = repo_config
         self._repo_info = repo_info
-        self._scan_file = config.data_path / f"{repo_info.id}.json"
+        self._scan_file = Scanner.results_path / f"{repo_info.id}.json"
 
         self._previous_scan = self._load_previous_scan() or {}
         self._scan = {
@@ -82,6 +86,9 @@ class Scanner(object):
 
             if config_file:
                 command += f" --additional-config={config_file}"
+
+            if logging.getLogger().level > logging.INFO:
+                command += " -q"
 
             logging.debug(command)
 

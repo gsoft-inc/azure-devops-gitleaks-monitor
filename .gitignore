@@ -107,3 +107,4 @@ venv.bak/
 .mypy_cache/
 
 config.yaml
+output.csv
