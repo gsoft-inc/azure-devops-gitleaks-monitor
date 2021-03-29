@@ -3,6 +3,8 @@ import argparse
 import csv
 import logging
 from pathlib import Path
+from pid import PidFile
+from contextlib import nullcontext
 
 import yaml
 
@@ -73,6 +75,7 @@ def main():
     parser.add_argument('--cache', action='store', dest='cache_path', default=default_cache_path, help=f'Cache location. Defaults to {default_cache_path}')
     parser.add_argument('--all', '-a', action="store_true", dest='output_all', default=False, help="Also outputs the previously found results.")
     parser.add_argument('--output', '-o', action="store", dest='output_file', default="/dev/null", help="File where a CSV report will be saved. Defaults to /dev/null")
+    parser.add_argument('--lock', '-l', action="store_true", dest='lock', default=False, help="Only allow one instance of the tool to run at the time.")
     parser.add_argument('-v', action="store_true", dest='verbose', default=False, help="Increases output verbosity.")
     parser.add_argument('-q', action="store_true", dest='quiet', default=False, help="Sets log level to error.")
 
@@ -95,7 +98,8 @@ def main():
     with open(args.config_file, "r") as f:
         configuration = Configuration(yaml.safe_load(f))
 
-    execute(configuration, args.output_all, args.output_file)
+    with PidFile('foo') if args.lock else nullcontext():
+        execute(configuration, args.output_all, args.output_file)
 
 
 if __name__ == "__main__":
