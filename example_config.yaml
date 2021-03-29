@@ -1,7 +1,7 @@
 organizations:
   default: # Default organization configuration. Values can be overridden for each organization.
-    username: "john.doe"
-    password: "azure-devops-pat-here"
+    username: ${AZURE_DEVOPS_USERNAME}
+    password: ${AZURE_DEVOPS_PAT}
     projects:
       default:
         repos:

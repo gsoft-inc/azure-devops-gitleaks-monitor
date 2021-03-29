@@ -6,12 +6,11 @@ from pathlib import Path
 from pid import PidFile
 from contextlib import nullcontext
 
-import yaml
-
 from azure_devops_connector import AzureDevopsConnector
 from git_repository import GitRepository
 from model.config import Configuration
 from scanner import Scanner
+from config_loader import load_configuration
 
 
 def scan(config: Configuration, output_all: bool):
@@ -95,8 +94,7 @@ def main():
     Scanner.results_path.mkdir(parents=True, exist_ok=True)
     GitRepository.repos_path.mkdir(parents=True, exist_ok=True)
 
-    with open(args.config_file, "r") as f:
-        configuration = Configuration(yaml.safe_load(f))
+    configuration = load_configuration(args.config_file)
 
     with PidFile('foo') if args.lock else nullcontext():
         execute(configuration, args.output_all, args.output_file)
