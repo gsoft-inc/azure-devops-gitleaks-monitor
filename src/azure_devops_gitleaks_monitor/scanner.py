@@ -10,6 +10,7 @@ import dateutil.parser
 import toml
 
 from git_repository import GitRepository
+from gitleaks_executor import GitleaksExecutor
 from model import OrganizationConfiguration, GitRepositoryConfiguration, GitRepositoryInformation
 
 
@@ -21,9 +22,6 @@ class Scanner(object):
         self._repo_config = repo_config
         self._repo_info = repo_info
         self._scan_file = Scanner.results_path / f"{repo_info.id}.json"
-
-        data_path = Path(__file__).parent / "data"
-        self._gitleaks_config_file = data_path / "gitleaks-rules.toml"
 
         self._previous_scan = self._load_previous_scan() or {}
         self._scan = {
@@ -75,7 +73,7 @@ class Scanner(object):
     def _find_secrets(self, repo: GitRepository, commits_to_scan=None) -> Optional[Iterable[Dict[str, Any]]]:
         commits_file = Scanner._create_commits_file(commits_to_scan)
         config_file = self._create_config_file()
-        report = tempfile.mktemp()
+        report_file = tempfile.mktemp()
 
         if commits_to_scan:
             logging.info(f"Scanning {len(commits_to_scan)} new commits for {self._repo_info}...")
@@ -83,28 +81,16 @@ class Scanner(object):
             logging.info(f"Scanning whole repository for {self._repo_info}...")
 
         try:
-            command = f'gitleaks --path="{repo.path}" --config-path={self._gitleaks_config_file} -o "{report}"'
-            if commits_file:
-                command += f" --commits-file={commits_file}"
-
-            if config_file:
-                command += f" --additional-config={config_file}"
-
-            if logging.getLogger().level > logging.INFO:
-                command += " -q"
-
-            logging.debug(command)
-
-            os.system(command)
-            if os.path.exists(report):
-                with open(report, "r") as f:
+            GitleaksExecutor(repo.path, report_file, commits_file, config_file).execute()
+            if os.path.exists(report_file):
+                with open(report_file, "r") as f:
                     return json.load(f)
             else:
                 return None
         finally:
             logging.debug(f"{self._repo_info} scanned.")
-            if os.path.exists(report):
-                os.remove(report)
+            if os.path.exists(report_file):
+                os.remove(report_file)
             if commits_file:
                 os.remove(commits_file)
             if config_file:
