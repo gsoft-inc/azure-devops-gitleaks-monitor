@@ -8,15 +8,14 @@ from typing import Dict, Iterable, Any, Tuple, List
 
 from pid import PidFile
 from slack_sdk.errors import SlackRequestError
+from slack_sdk.webhook import WebhookClient
 
 from azure_devops_connector import AzureDevopsConnector
 from config_loader import load_configuration
 from git_repository import GitRepository
-from model.config import Configuration, GitRepositoryConfiguration
-from model.git_repository_information import GitRepositoryInformation
+from model import Configuration, GitRepositoryConfiguration, GitRepositoryInformation
 from scanner import Scanner
 from slack_message_builder import SlackMessageBuilder
-from slack_sdk.webhook import WebhookClient
 
 
 def scan(config: Configuration, output_all: bool) -> Iterable[Tuple[GitRepositoryInformation, GitRepositoryConfiguration, List[Dict[str, Any]]]]:
@@ -71,21 +70,16 @@ def execute(config: Configuration, output_all: bool, output_file: str, output_sl
             if output_slack and repo_config.slack_webhook:
                 webhook = WebhookClient(repo_config.slack_webhook)
                 for blocks in SlackMessageBuilder(repo_info, secrets).build():
-                    print({"blocks": list(blocks)})
                     response = webhook.send(text="fallback", blocks=blocks)
                     if response.status_code != 200:
                         raise SlackRequestError(f"Error when sending message blocks to slack: {response.body}")
 
 
-
 def main():
-    script_directory = Path(__file__).parent
-    default_config_file = "config.yaml"
-    default_config_file_path = script_directory / default_config_file
-    default_cache_path = Path("~/.azure-devops-secret-finder").expanduser()
+    default_cache_path = Path("~/.azure-devops-gitleaks-monitor").expanduser()
 
     parser = argparse.ArgumentParser(description='Azure DevOps Gitleaks monitor')
-    parser.add_argument('--config', '-c', action='store', dest='config_file', default=default_config_file_path, help=f'Configuration file. Defaults to {default_config_file}')
+    parser.add_argument('--config', '-c', action='store', dest='config_file', help=f'Configuration file.')
     parser.add_argument('--cache', action='store', dest='cache_path', default=default_cache_path, help=f'Cache location. Defaults to {default_cache_path}')
     parser.add_argument('--all', '-a', action="store_true", dest='output_all', default=False, help="Also outputs the previously found results.")
     parser.add_argument('--output', '-o', action="store", dest='output_file', default="/dev/null", help="File where a CSV report will be saved. Defaults to /dev/null")

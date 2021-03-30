@@ -3,7 +3,7 @@ import re
 
 import yaml
 
-from model.config import Configuration
+from model import Configuration
 
 path_matcher = re.compile(r'.*\$\{([^}^{]+)\}.*')
 

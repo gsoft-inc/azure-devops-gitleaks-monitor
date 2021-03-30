@@ -8,7 +8,7 @@ from azure.devops.connection import Connection
 from msrest.authentication import BasicAuthentication
 from requests.auth import HTTPBasicAuth
 
-from model.git_repository_information import GitRepositoryInformation
+from model import GitRepositoryInformation
 
 
 class AzureDevopsConnector(object):

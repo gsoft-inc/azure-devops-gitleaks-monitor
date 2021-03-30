@@ -10,8 +10,7 @@ import dateutil.parser
 import toml
 
 from git_repository import GitRepository
-from model.config import OrganizationConfiguration, GitRepositoryConfiguration
-from model.git_repository_information import GitRepositoryInformation
+from model import OrganizationConfiguration, GitRepositoryConfiguration, GitRepositoryInformation
 
 
 class Scanner(object):
@@ -22,6 +21,9 @@ class Scanner(object):
         self._repo_config = repo_config
         self._repo_info = repo_info
         self._scan_file = Scanner.results_path / f"{repo_info.id}.json"
+
+        data_path = Path(__file__).parent / "data"
+        self._gitleaks_config_file = data_path / "gitleaks-rules.toml"
 
         self._previous_scan = self._load_previous_scan() or {}
         self._scan = {
@@ -81,7 +83,7 @@ class Scanner(object):
             logging.info(f"Scanning whole repository for {self._repo_info}...")
 
         try:
-            command = f'gitleaks --path="{repo.path}" --config-path=gitleaks-rules.toml -o "{report}"'
+            command = f'gitleaks --path="{repo.path}" --config-path={self._gitleaks_config_file} -o "{report}"'
             if commits_file:
                 command += f" --commits-file={commits_file}"
 

@@ -2,7 +2,7 @@ import itertools
 from urllib.parse import urlencode
 from typing import List, Dict, Any
 
-from model.git_repository_information import GitRepositoryInformation
+from model import GitRepositoryInformation
 
 
 class SlackMessageBuilder:
