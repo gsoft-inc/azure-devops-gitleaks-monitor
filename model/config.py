@@ -9,11 +9,15 @@ class GitRepositoryConfiguration:
         self.name = name
         self.skip = False
         self.persist = False
+        self.slack_webhook = None
         self.allowlist: Dict[str, List] = {}
 
     def configure(self, config: Dict):
         self.skip = config.get("skip", False)
         self.persist = config.get("persist", False)
+
+        if "slack-webhook" in config:
+            self.slack_webhook = config["slack-webhook"]
 
         for allowlist_type, values in config.get("allowlist", {}).items():
             self.allowlist.setdefault(allowlist_type, []).extend(values)

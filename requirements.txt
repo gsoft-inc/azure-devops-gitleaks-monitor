@@ -6,3 +6,4 @@ pyyaml
 requests
 toml
 pid
+slack-sdk

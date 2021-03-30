@@ -5,7 +5,7 @@ from urllib.parse import quote
 import git
 
 import model.config
-from model.git_repository import GitRepositoryInformation
+from model.git_repository_information import GitRepositoryInformation
 from util import rmdir
 
 

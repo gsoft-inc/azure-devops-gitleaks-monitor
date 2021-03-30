@@ -29,6 +29,7 @@ optional arguments:
   --all, -a             Also outputs the previously found results.
   --output OUTPUT_FILE, -o OUTPUT_FILE
                         File where a CSV report will be saved. Defaults to /dev/null
+  --slack, -s           Send slack notifications to the configured webhooks when secrets are found.                      
   --lock, -l            Only allow one instance of the tool to run at the time.
   -v                    Increases output verbosity.
   -q                    Sets log level to error.

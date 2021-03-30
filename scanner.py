@@ -4,13 +4,14 @@ import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Dict, Any, Iterable, Optional
 
 import dateutil.parser
 import toml
 
 from git_repository import GitRepository
 from model.config import OrganizationConfiguration, GitRepositoryConfiguration
-from model.git_repository import GitRepositoryInformation
+from model.git_repository_information import GitRepositoryInformation
 
 
 class Scanner(object):
@@ -38,7 +39,7 @@ class Scanner(object):
 
         return last_push > dateutil.parser.isoparse(last_scan_date)
 
-    def scan(self):
+    def scan(self) -> Iterable[Dict[str, Any]]:
         with GitRepository(self._org_config, self._repo_config, self._repo_info) as repo:
             repo.update()
 
@@ -61,15 +62,15 @@ class Scanner(object):
             self._scan["secrets"] = secrets
             return new_secrets
 
-    def get_all_secrets(self):
-        return self._scan.get("secrets") or self._previous_scan.get("secrets")
+    def get_all_secrets(self) -> Iterable[Dict[str, Any]]:
+        return self._scan.get("secrets") or self._previous_scan.get("secrets") or []
 
     def save(self):
         j = json.dumps(self._scan, indent=1)
         with self._scan_file.open("w") as f:
             f.write(j)
 
-    def _find_secrets(self, repo: GitRepository, commits_to_scan=None):
+    def _find_secrets(self, repo: GitRepository, commits_to_scan=None) -> Optional[Iterable[Dict[str, Any]]]:
         commits_file = Scanner._create_commits_file(commits_to_scan)
         config_file = self._create_config_file()
         report = tempfile.mktemp()

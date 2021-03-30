@@ -6,6 +6,7 @@ organizations:
       default:
         repos:
           default:
+            slack-webhook: ${GITLEAKS_SLACK_WEBHOOK}
             skip: false # All repositories will be analyzed by default.
   SomeOrganization:
     projects:
