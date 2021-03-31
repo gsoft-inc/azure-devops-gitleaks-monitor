@@ -4,7 +4,7 @@ import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, Iterable, Optional
+from typing import Dict, Any, Iterable
 
 import dateutil.parser
 import toml
@@ -44,6 +44,7 @@ class Scanner(object):
             repo.update()
 
             commits = repo.get_commits()
+            self._scan["secrets"] = self._previous_scan.get("secrets", [])[:]
             self._scan["commits"] = commits
 
             old_commits = self._previous_scan.get("commits")
@@ -54,12 +55,7 @@ class Scanner(object):
             else:
                 new_secrets = self._find_secrets(repo)
 
-            if not new_secrets:
-                return []
-
-            secrets = self._previous_scan.get("secrets", [])[:]
-            secrets.extend(new_secrets)
-            self._scan["secrets"] = secrets
+            self._scan["secrets"].extend(new_secrets)
             return new_secrets
 
     def get_all_secrets(self) -> Iterable[Dict[str, Any]]:
@@ -70,10 +66,9 @@ class Scanner(object):
         with self._scan_file.open("w") as f:
             f.write(j)
 
-    def _find_secrets(self, repo: GitRepository, commits_to_scan=None) -> Optional[Iterable[Dict[str, Any]]]:
+    def _find_secrets(self, repo: GitRepository, commits_to_scan=None) -> Iterable[Dict[str, Any]]:
         commits_file = Scanner._create_commits_file(commits_to_scan)
         config_file = self._create_config_file()
-        report_file = tempfile.mktemp()
 
         if commits_to_scan:
             logging.info(f"Scanning {len(commits_to_scan)} new commits for {self._repo_info}...")
@@ -81,16 +76,9 @@ class Scanner(object):
             logging.info(f"Scanning whole repository for {self._repo_info}...")
 
         try:
-            GitleaksExecutor(repo.path, report_file, commits_file, config_file).execute()
-            if os.path.exists(report_file):
-                with open(report_file, "r") as f:
-                    return json.load(f)
-            else:
-                return None
+            return GitleaksExecutor(repo.path, commits_file, config_file).execute()
         finally:
             logging.debug(f"{self._repo_info} scanned.")
-            if os.path.exists(report_file):
-                os.remove(report_file)
             if commits_file:
                 os.remove(commits_file)
             if config_file:
