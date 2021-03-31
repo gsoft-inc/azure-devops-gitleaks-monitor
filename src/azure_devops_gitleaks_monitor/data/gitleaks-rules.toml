@@ -281,6 +281,7 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 			# Auth
 			'''AuthConfiguration"\s*:\s*"AspNet_MVC"''',
 			'''(?i)["']?auth[a-z0-9_-]*url["']?\s*[:=]''',
+			'''(?i)"authLevel": "[a-z]+"''',
 		]
 		files = [
 		'''(?i)(.*?)\.(cs|cls|vb|vbs|js|jsx|ts|tsx|java|php|py|rb|perl|c|cpp|ps1|psm1|sh|cmd)(\.orig)?$''',
@@ -340,10 +341,12 @@ regex = '''(?i)(api_key|apikey|token|secret|key|api|password|pw)'''
 		'''(?i)\.dll(-help)?\.xml(\.orig)?$''',
 		'''(?i).*\.(min|debug|bundle)\.js$''',
 		'''^modules.json$''',
+		'''^.npmrc$''',
 		'''^package(-lock)?.json$''',
 		'''^project.lock.json$''',
 		'''(?i)messages.*\.resx(\.orig)?$''',
 		'''Test.*\.cls$''',
+		'''^icon.overrides$''',
 		'''(bootstrap|jquery|lodash|moment|knockout|date|jqxribbon).*\.js$''',
 		'''(?i)^ruleset.*\.xml$''',
 		'''^workspace.xml$''',
