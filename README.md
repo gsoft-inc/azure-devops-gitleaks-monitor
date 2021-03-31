@@ -10,14 +10,14 @@ Install Gitleaks
 GO111MODULE=on go get github.com/zricethezav/gitleaks/v7
 ```
 
-Install Python requirements
+Install azure-devops-gitleaks-monitor
 ```
-pip3 install -r requirements.txt
+python3 setup.py install
 ```
 
 ## Usage
 ```
-usage: main.py [-h] [--config CONFIG_FILE] [--cache CACHE_PATH] [--all] [--output OUTPUT_FILE] [-v] [-q]
+usage: azure-devops-gitleaks-monitor [-h] [--config CONFIG_FILE] [--cache CACHE_PATH] [--all] [--output OUTPUT_FILE] [-v] [-q]
 
 Azure DevOps Gitleaks monitor
 
@@ -25,7 +25,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --config CONFIG_FILE, -c CONFIG_FILE
                         Configuration file. Defaults to config.yaml
-  --cache CACHE_PATH    Cache location. Defaults to /home/mathieu/.azure-devops-secret-finder
+  --cache CACHE_PATH    Cache location. Defaults to ~/.azure-devops-secret-finder
   --all, -a             Also outputs the previously found results.
   --output OUTPUT_FILE, -o OUTPUT_FILE
                         File where a CSV report will be saved. Defaults to /dev/null
@@ -33,6 +33,19 @@ optional arguments:
   --lock, -l            Only allow one instance of the tool to run at the time.
   -v                    Increases output verbosity.
   -q                    Sets log level to error.
+```
+
+### Recommended usage
+Generate a report with all the existing secrets.
+You might need to configure custom whitelists to avoid false positives.
+```
+azure-devops-gitleaks-monitor --config config.xml --all --output report.csv
+```
+
+Create a cron job that executes the following command to send new secrets to Slack.
+It is recommended to run the tool on all repositories at least once before to avoid sending too many messages to Slack.
+```
+azure-devops-gitleaks-monitor --config config.xml --lock --slack
 ```
 
 ## License
