@@ -70,12 +70,15 @@ class Scanner(object):
         commits_file = Scanner._create_commits_file(commits_to_scan)
         config_file = self._create_config_file()
 
-        if commits_to_scan:
-            logging.info(f"Scanning {len(commits_to_scan)} new commits for {self._repo_info}...")
-        else:
-            logging.info(f"Scanning whole repository for {self._repo_info}...")
-
         try:
+            if commits_to_scan is None:
+                logging.info(f"Scanning whole repository for {self._repo_info}...")
+            elif len(commits_to_scan) == 0:
+                logging.info(f"No new commits for {self._repo_info}. Skipping ...")
+                return []
+            else:
+                logging.info(f"Scanning {len(commits_to_scan)} new commits for {self._repo_info}...")
+
             return GitleaksExecutor(repo.path, commits_file, config_file).execute()
         finally:
             logging.debug(f"{self._repo_info} scanned.")

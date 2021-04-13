@@ -106,7 +106,7 @@ def main():
 
     configuration = load_configuration(args.config_file)
 
-    with PidFile('foo') if args.lock else nullcontext():
+    with PidFile() if args.lock else nullcontext():
         execute(configuration, args.output_all, args.output_file, args.output_slack)
 
 
