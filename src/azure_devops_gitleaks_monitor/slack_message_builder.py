@@ -20,7 +20,7 @@ class SlackMessageBuilder:
             return
 
         for blocks in itertools.zip_longest(*[iter(self._build_blocks())] * SlackMessageBuilder.max_blocks):
-            yield blocks
+            yield [block for block in blocks if block]
 
     def _build_blocks(self):
         yield self._build_header_block()
